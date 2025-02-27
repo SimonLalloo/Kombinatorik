@@ -1,0 +1,42 @@
+name: Kombinatorik
+version: 0.1.0.0
+github: "SimonLalloo/Kombinatorik"
+author: "Simon Lalloo"
+maintainer: "simon@lalloo.me"
+copyright: "2025 Simon Lalloo"
+
+description: Please see the README on GitHub at <https://github.com/SimonLalloo/Kombinatorik>
+
+dependencies:
+  - base >= 4.7 && < 5
+  - fgl
+  - filepath
+  - graphviz
+  - text
+  - containers
+  - Chart
+  - Chart-cairo
+
+library:
+  source-dirs: src
+
+executables:
+  section1:
+    main: Section1.hs
+    source-dirs: app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - Kombinatorik
+
+  # section2:
+  #   main: Section2.hs
+  #   source-dirs: app
+  #   ghc-options:
+  #     - -threaded
+  #     - -rtsopts
+  #     - -with-rtsopts=-N
+  #   dependencies:
+  #     - graph-assignment
