@@ -16,6 +16,7 @@ dependencies:
   - containers
   - Chart
   - Chart-cairo
+  - random
 
 library:
   source-dirs: src

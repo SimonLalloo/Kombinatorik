@@ -35,6 +35,7 @@ library
     , fgl
     , filepath
     , graphviz
+    , random
     , text
   default-language: Haskell2010
 
@@ -54,5 +55,6 @@ executable section1
     , fgl
     , filepath
     , graphviz
+    , random
     , text
   default-language: Haskell2010

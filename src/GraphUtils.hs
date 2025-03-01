@@ -1,5 +1,6 @@
-module GraphUtils where
+module GraphUtils (makePruferCode, makePruferGraph, genRandomTree) where
 
+import Control.Monad (replicateM)
 import Data.Graph.Inductive (
   Gr,
   Graph (noNodes),
@@ -11,6 +12,7 @@ import Data.Graph.Inductive (
   nodes,
  )
 import Data.List (sort, (\\))
+import System.Random (randomRIO)
 import Text.Printf (printf)
 
 ----------------------------------------
@@ -46,3 +48,12 @@ makeEdgesFromCode (x : xs) vertices =
   let l = minimum $ vertices \\ (x : xs)
       edge = if l < x then (l, x) else (x, l) -- because mkUGraph is stupid
    in edge : makeEdgesFromCode xs (filter (/= l) vertices)
+
+genRandomCode :: Int -> IO [Int]
+genRandomCode n = replicateM n $ randomRIO (1, n)
+
+-- Generates a random tree with n nodes (requires n > 2)
+genRandomTree :: Int -> IO (Gr () ())
+genRandomTree n = do
+  code <- genRandomCode (n - 2)
+  return $ makePruferGraph code
