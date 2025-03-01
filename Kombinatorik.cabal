@@ -21,6 +21,8 @@ source-repository head
 library
   exposed-modules:
       GraphUtils
+      GraphViz
+      SampleGraphs
   other-modules:
       Paths_Kombinatorik
   hs-source-dirs:
