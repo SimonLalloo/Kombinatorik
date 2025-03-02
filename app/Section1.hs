@@ -1,6 +1,7 @@
 module Main where
 
-import GraphUtils (genGaltonWatson, genRandomTree, makePruferCode, makePruferGraph, randomFromTree)
+import Data.Random.Distribution.Poisson
+import GraphUtils
 import GraphViz (visualizeDirectedUnlabelledGraph, visualizeUnlabelledGraph)
 import SampleGraphs (createSampleGraphL8F8)
 import System.Random (randomRIO)
@@ -27,5 +28,7 @@ main = do
   putStrLn "Genertating Galton-Watson tree from that tree..."
   galtonWatson <- genGaltonWatson $ randomFromTree randomTree
   visualizeDirectedUnlabelledGraph galtonWatson "out/GaltonWatson.png"
+
+  putStrLn $ "Diameter of the random tree is " ++ (show $ diameter randomTree)
 
   putStrLn "Done"

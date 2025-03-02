@@ -1,6 +1,17 @@
 {-# LANGUAGE TupleSections #-}
 
-module GraphUtils (makePruferCode, makePruferGraph, genRandomTree, genGaltonWatson, randomFromTree) where
+module GraphUtils (
+  makePruferCode, 
+  makePruferGraph, 
+  genRandomTree, 
+  genGaltonWatson, 
+  randomFromTree, 
+  degrees, 
+  avgDegree, 
+  maxDegree, 
+  minDegree, 
+  diameter) 
+  where
 
 import Control.Monad (replicateM)
 import Data.Graph.Inductive (
@@ -13,7 +24,8 @@ import Data.Graph.Inductive (
   nodes,
  )
 import Data.Graph.Inductive.Graph
-import Data.List (sort, (\\))
+import Data.List (maximumBy, sort, (\\))
+import Data.Ord (comparing)
 import System.Random (randomRIO)
 import Text.Printf (printf)
 
@@ -23,6 +35,19 @@ import Text.Printf (printf)
 
 findMinLeaf :: Gr () () -> Int
 findMinLeaf g = minimum $ filter (\n -> deg g n == 1) $ nodes g
+
+-- Find the furthest node from i, and the distance to it
+findFurthest :: Gr () () -> Node -> (Node, Int)
+findFurthest g i 
+  | length (nodes g) == 1 = (1, 0)
+  | otherwise = maximumBy (comparing snd) $ map (\neighbor -> findFurthest' g neighbor i 1) (neighbors g i)
+
+findFurthest' :: Gr () () -> Node -> Node -> Int -> (Node, Int)
+findFurthest' g i prev n
+  | length (neighbors g i) <= 1 =
+      (i, n)
+  | otherwise =
+      maximumBy (comparing snd) $ map (\neighbor -> findFurthest' g neighbor i (n + 1)) (neighbors g i \\ [prev])
 
 ----------------------------------------
 --------------- Prufer -----------------
@@ -116,3 +141,27 @@ randomFromTree :: Gr () () -> IO Int
 randomFromTree g = do
   r <- randomRIO (1, noNodes g)
   return $ outdeg g r
+
+----------------------------------------
+----------------- Stats ----------------
+----------------------------------------
+
+degrees :: Gr () () -> [Int]
+degrees g = map (deg g) $ nodes g
+
+avgDegree :: Gr () () -> Double
+avgDegree g = fromIntegral (sum (degrees g)) / fromIntegral (length $ degrees g)
+
+maxDegree :: Gr () () -> Int
+maxDegree g = maximum $ degrees g
+
+minDegree :: Gr () () -> Int
+minDegree g = minimum $ degrees g
+
+diameter :: Gr () () -> Int
+diameter g
+  | length (nodes g) <= 1 = 0
+  | otherwise =
+      let (node, _) = findFurthest g 1
+          (_, distance) = findFurthest g node
+       in distance
