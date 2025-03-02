@@ -1,9 +1,11 @@
 module Main where
 
-import GraphUtils (genGaltonWatson, genRandomTree, makePruferCode, makePruferGraph)
+import GraphUtils (genGaltonWatson, genRandomTree, makePruferCode, makePruferGraph, randomFromTree)
 import GraphViz (visualizeDirectedUnlabelledGraph, visualizeUnlabelledGraph)
 import SampleGraphs (createSampleGraphL8F8)
 import System.Random (randomRIO)
+
+-- TODO: Rename this module
 
 -- This requires that you have a directory "out/" in the same path as the executable
 main :: IO ()
@@ -17,13 +19,13 @@ main = do
   visualizeDirectedUnlabelledGraph newGraph "out/Prufer-graph.png"
 
   -- Test the random tree generation
-  putStrLn "Genertating random tree..."
+  putStrLn "Genertating random tree with 10 nodes ..."
   randomTree <- genRandomTree 10
   visualizeDirectedUnlabelledGraph randomTree "out/Random.png"
 
   -- Test Galton-Watson
-  putStrLn "Genertating Galton-Watson tree..."
-  galtonWatson <- genGaltonWatson $ randomRIO (0, 2)
+  putStrLn "Genertating Galton-Watson tree from that tree..."
+  galtonWatson <- genGaltonWatson $ randomFromTree randomTree
   visualizeDirectedUnlabelledGraph galtonWatson "out/GaltonWatson.png"
 
   putStrLn "Done"

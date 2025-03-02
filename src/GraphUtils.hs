@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections #-}
 
-module GraphUtils (makePruferCode, makePruferGraph, genRandomTree, genGaltonWatson) where
+module GraphUtils (makePruferCode, makePruferGraph, genRandomTree, genGaltonWatson, randomFromTree) where
 
 import Control.Monad (replicateM)
 import Data.Graph.Inductive (
@@ -74,15 +74,6 @@ makeEdgesFromCode (x : xs) vertices =
    in edge : makeEdgesFromCode xs (filter (/= l) vertices)
 -}
 
-genRandomCode :: Int -> IO [Int]
-genRandomCode n = replicateM n $ randomRIO (1, n)
-
--- Generates a random tree with n nodes (requires n > 2)
-genRandomTree :: Int -> IO (Gr () ())
-genRandomTree n = do
-  code <- genRandomCode (n - 2)
-  return $ makePruferGraph code
-
 ----------------------------------------
 ------------ Galton-Watson -------------
 ----------------------------------------
@@ -105,3 +96,23 @@ genGaltonWatson'' 0 _ (unhandled, v, e) = (unhandled, v, e)
 genGaltonWatson'' n node (unhandled, v, e) =
   let child = 1 + length v
    in genGaltonWatson'' (n - 1) node (child : unhandled, (child, ()) : v, (node, child, ()) : e)
+
+----------------------------------------
+-------------- Randomness --------------
+----------------------------------------
+
+-- Generates a random Prufer Code
+genRandomCode :: Int -> IO [Int]
+genRandomCode n = replicateM n $ randomRIO (1, n)
+
+-- Generates a random tree with n nodes (requires n > 2)
+genRandomTree :: Int -> IO (Gr () ())
+genRandomTree n = do
+  code <- genRandomCode (n - 2)
+  return $ makePruferGraph code
+
+-- Generates a random number from a tree as described in task 5.
+randomFromTree :: Gr () () -> IO Int
+randomFromTree g = do
+  r <- randomRIO (1, noNodes g)
+  return $ outdeg g r
