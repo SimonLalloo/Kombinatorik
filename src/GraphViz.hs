@@ -1,4 +1,4 @@
-module GraphViz (visualizeUnlabelledGraph) where
+module GraphViz (visualizeUnlabelledGraph, visualizeDirectedUnlabelledGraph) where
 
 import Data.Graph.Inductive (
   Gr,
@@ -26,9 +26,19 @@ visualizeUnlabelledGraph g path = do
   let labelledGraph = convertToLabelledGraph g
   visualizeGraph labelledGraph path
 
+visualizeDirectedUnlabelledGraph :: Gr () () -> FilePath -> IO FilePath
+visualizeDirectedUnlabelledGraph g path = do
+  let labelledGraph = convertToLabelledGraph g
+  visualizeDirectedGraph labelledGraph path
+
 visualizeGraph :: (Labellable nl, Labellable el) => Gr nl el -> FilePath -> IO FilePath
 visualizeGraph g path = do
   let dotGraph = graphToDot (nonClusteredParams{isDirected = False}) g
+  runGraphvizCommand Dot dotGraph Png path
+
+visualizeDirectedGraph :: (Labellable nl, Labellable el) => Gr nl el -> FilePath -> IO FilePath
+visualizeDirectedGraph g path = do
+  let dotGraph = graphToDot (nonClusteredParams{isDirected = True}) g
   runGraphvizCommand Dot dotGraph Png path
 
 convertToLabelledGraph :: Gr () () -> Gr String String
