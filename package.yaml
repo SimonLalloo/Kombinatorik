@@ -17,7 +17,6 @@ dependencies:
   - Chart
   - Chart-cairo
   - random
-  - random-fu
 
 library:
   source-dirs: src

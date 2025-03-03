@@ -1,9 +1,9 @@
 module Main where
 
-import Data.Random.Distribution.Poisson
 import GraphUtils
 import SampleGraphs (createSampleGraphL8F8)
 import System.Random (randomRIO)
+import Tasks (task6)
 import Visualization (makeHistogram, visualizeDirectedUnlabelledGraph, visualizeUnlabelledGraph)
 
 -- TODO: Rename this module
@@ -29,6 +29,6 @@ main = do
   galtonWatson <- genGaltonWatson $ randomFromTree randomTree
   visualizeDirectedUnlabelledGraph galtonWatson "out/GaltonWatson.png"
 
-  putStrLn $ "Diameter of the random tree is " ++ (show $ diameter randomTree)
+  task6 1000
 
   putStrLn "Done"

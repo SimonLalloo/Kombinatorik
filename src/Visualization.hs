@@ -56,7 +56,7 @@ convertToLabelledGraph g =
 ------------- Histograms! --------------
 ----------------------------------------
 
-makeHistogram :: [Int] -> String -> IO ()
+makeHistogram :: (Show a, Real a) => [a] -> String -> IO ()
 makeHistogram values name = do
   let convertedData = map (\g -> (head g, length g)) $ group $ sort values
   generateGraph convertedData "test" ("out/" ++ name ++ ".png")

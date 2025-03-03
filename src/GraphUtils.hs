@@ -11,6 +11,8 @@ module GraphUtils (
   maxDegree,
   minDegree,
   diameter,
+  poisson,
+  avg,
 )
 where
 
@@ -133,6 +135,8 @@ genRandomCode n = replicateM n $ randomRIO (1, n)
 
 -- Generates a random tree with n nodes (requires n > 2)
 genRandomTree :: Int -> IO (Gr () ())
+genRandomTree 1 = return $ mkGraph [(1, ())] []
+genRandomTree 2 = return $ mkGraph [(1, ()), (2, ())] [(1, 2, ())]
 genRandomTree n = do
   code <- genRandomCode (n - 2)
   return $ makePruferGraph code
@@ -143,6 +147,25 @@ randomFromTree g = do
   r <- randomRIO (1, noNodes g)
   return $ outdeg g r
 
+-- Generate a random number from the poisson distribution
+poisson :: Double -> IO Int
+poisson lambda = do
+  let l = exp (-lambda)
+      k = 0
+      p = 1.0
+  poisson' k p l
+
+poisson' :: Int -> Double -> Double -> IO Int
+poisson' k p l = do
+  let k' = k + 1
+  u <- randomRIO (0.0, 1.0)
+  let p' = p * u
+  if p' > l
+    then
+      poisson' k' p' l
+    else
+      return $ k' - 1
+
 ----------------------------------------
 ----------------- Stats ----------------
 ----------------------------------------
@@ -151,7 +174,10 @@ degrees :: Gr () () -> [Int]
 degrees g = map (deg g) $ nodes g
 
 avgDegree :: Gr () () -> Double
-avgDegree g = fromIntegral (sum (degrees g)) / fromIntegral (length $ degrees g)
+avgDegree g = avg $ degrees g
+
+avg :: (Real a, Fractional b) => [a] -> b
+avg xs = realToFrac (sum xs) / fromIntegral (length xs)
 
 maxDegree :: Gr () () -> Int
 maxDegree g = maximum $ degrees g
