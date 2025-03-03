@@ -13,10 +13,13 @@ module GraphUtils (
   diameter,
   poisson,
   avg,
+  caroWei,
+  greedyUnconnected,
 )
 where
 
 import Control.Monad (replicateM)
+import Data.Function (on)
 import Data.Graph.Inductive (
   Gr,
   Graph (noNodes),
@@ -27,9 +30,10 @@ import Data.Graph.Inductive (
   nodes,
  )
 import Data.Graph.Inductive.Graph
-import Data.List (maximumBy, sort, (\\))
+import Data.List (maximumBy, sort, sortBy, (\\))
 import Data.Ord (comparing)
 import System.Random (randomRIO)
+import System.Random.Shuffle (shuffleM)
 import Text.Printf (printf)
 
 ----------------------------------------
@@ -192,3 +196,37 @@ diameter g
       let (node, _) = findFurthest g 1
           (_, distance) = findFurthest g node
        in distance
+
+----------------------------------------
+--------------- Caro-Wei ---------------
+----------------------------------------
+
+caroWei :: Gr () () -> IO [Int]
+caroWei g = do
+  labeledGraph <- addRandomLabels g
+  return $ caroWei' g $ noNodes g
+
+caroWei' :: Gr () () -> Int -> [Int]
+caroWei' g 0 = []
+caroWei' g n =
+  let l = map (\i -> lab g n < lab g i) $ neighbors g n
+   in if and l then n : caroWei' g (n - 1) else caroWei' g (n - 1)
+
+-- from smallest to largest
+-- if no neighbor in independent set, add node
+greedyUnconnected :: Gr () () -> IO [Int]
+greedyUnconnected g = do
+  labeledGraph <- addRandomLabels g
+  let sortedNodes = sortBy (on compare snd) (labNodes labeledGraph)
+  return $ greedyUnconnected' labeledGraph sortedNodes []
+
+greedyUnconnected' :: Gr Int () -> [(Int, Int)] -> [Int] -> [Int]
+greedyUnconnected' g [] set = set
+greedyUnconnected' g ((node, _) : xs) set =
+  let l = map (`elem` set) $ neighbors g node
+   in if or l then greedyUnconnected' g xs set else greedyUnconnected' g xs (node : set)
+
+addRandomLabels :: Gr () () -> IO (Gr Int ())
+addRandomLabels g = do
+  labels <- shuffleM [1 .. noNodes g]
+  return $ gmap (\(ins, n, _, outs) -> (ins, n, labels !! (n - 1), outs)) g
