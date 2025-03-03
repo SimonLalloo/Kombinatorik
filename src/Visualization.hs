@@ -1,4 +1,4 @@
-module GraphViz (visualizeUnlabelledGraph, visualizeDirectedUnlabelledGraph) where
+module Visualization (visualizeUnlabelledGraph, visualizeDirectedUnlabelledGraph, makeHistogram) where
 
 import Data.Graph.Inductive (
   Gr,
@@ -13,6 +13,9 @@ import Data.GraphViz (
   nonClusteredParams,
   runGraphvizCommand,
  )
+import Data.List (group, sort)
+import Graphics.Rendering.Chart.Backend.Cairo
+import Graphics.Rendering.Chart.Easy
 import Text.Printf (printf)
 
 ----------------------------------------
@@ -48,3 +51,20 @@ convertToLabelledGraph g =
       labelledNodes = [(n, printf "Node %d" n) | (n, _) <- nodeList]
       labelledEdges = [(u, v, printf "Edge %d-%d" u v) | (u, v, _) <- edgeList]
    in mkGraph labelledNodes labelledEdges
+
+----------------------------------------
+------------- Histograms! --------------
+----------------------------------------
+
+makeHistogram :: [Int] -> String -> IO ()
+makeHistogram values name = do
+  let convertedData = map (\g -> (head g, length g)) $ group $ sort values
+  generateGraph convertedData "test" ("out/" ++ name ++ ".png")
+
+generateGraph :: (Show a, BarsPlotValue y) => [(a, y)] -> String -> FilePath -> IO ()
+generateGraph values title path =
+  toFile def path $ do
+    layout_title .= "Sample Bars"
+    layout_title_style . font_size .= 10
+    layout_x_axis . laxis_generate .= autoIndexAxis (map (show . fst) values)
+    plot $ plotBars <$> bars [title] (addIndexes (map ((: []) . snd) values))

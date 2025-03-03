@@ -21,8 +21,8 @@ source-repository head
 library
   exposed-modules:
       GraphUtils
-      GraphViz
       SampleGraphs
+      Visualization
   other-modules:
       Paths_Kombinatorik
   hs-source-dirs:
@@ -36,6 +36,7 @@ library
     , filepath
     , graphviz
     , random
+    , random-fu
     , text
   default-language: Haskell2010
 
@@ -56,5 +57,6 @@ executable section1
     , filepath
     , graphviz
     , random
+    , random-fu
     , text
   default-language: Haskell2010

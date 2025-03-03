@@ -2,9 +2,9 @@ module Main where
 
 import Data.Random.Distribution.Poisson
 import GraphUtils
-import GraphViz (visualizeDirectedUnlabelledGraph, visualizeUnlabelledGraph)
 import SampleGraphs (createSampleGraphL8F8)
 import System.Random (randomRIO)
+import Visualization (makeHistogram, visualizeDirectedUnlabelledGraph, visualizeUnlabelledGraph)
 
 -- TODO: Rename this module
 

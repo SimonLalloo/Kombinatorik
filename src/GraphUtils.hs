@@ -1,17 +1,18 @@
 {-# LANGUAGE TupleSections #-}
 
 module GraphUtils (
-  makePruferCode, 
-  makePruferGraph, 
-  genRandomTree, 
-  genGaltonWatson, 
-  randomFromTree, 
-  degrees, 
-  avgDegree, 
-  maxDegree, 
-  minDegree, 
-  diameter) 
-  where
+  makePruferCode,
+  makePruferGraph,
+  genRandomTree,
+  genGaltonWatson,
+  randomFromTree,
+  degrees,
+  avgDegree,
+  maxDegree,
+  minDegree,
+  diameter,
+)
+where
 
 import Control.Monad (replicateM)
 import Data.Graph.Inductive (
@@ -38,7 +39,7 @@ findMinLeaf g = minimum $ filter (\n -> deg g n == 1) $ nodes g
 
 -- Find the furthest node from i, and the distance to it
 findFurthest :: Gr () () -> Node -> (Node, Int)
-findFurthest g i 
+findFurthest g i
   | length (nodes g) == 1 = (1, 0)
   | otherwise = maximumBy (comparing snd) $ map (\neighbor -> findFurthest' g neighbor i 1) (neighbors g i)
 
