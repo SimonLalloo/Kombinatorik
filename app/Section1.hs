@@ -31,4 +31,7 @@ main = do
 
   task6 1000
 
+  erdosRenyi <- genErdosRenyi 10 0.5
+  visualizeUnlabelledGraph erdosRenyi "out/ErdosRenyi.png"
+
   putStrLn "Done"

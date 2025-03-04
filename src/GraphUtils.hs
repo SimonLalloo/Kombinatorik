@@ -15,6 +15,7 @@ module GraphUtils (
   avg,
   caroWei,
   greedyUnconnected,
+  genErdosRenyi,
 )
 where
 
@@ -212,8 +213,7 @@ caroWei' g n =
   let l = map (\i -> lab g n < lab g i) $ neighbors g n
    in if and l then n : caroWei' g (n - 1) else caroWei' g (n - 1)
 
--- from smallest to largest
--- if no neighbor in independent set, add node
+-- This uses the variant with random labels described in task 7
 greedyUnconnected :: Gr () () -> IO [Int]
 greedyUnconnected g = do
   labeledGraph <- addRandomLabels g
@@ -230,3 +230,20 @@ addRandomLabels :: Gr () () -> IO (Gr Int ())
 addRandomLabels g = do
   labels <- shuffleM [1 .. noNodes g]
   return $ gmap (\(ins, n, _, outs) -> (ins, n, labels !! (n - 1), outs)) g
+
+----------------------------------------
+-------------- Erdös-Renyi -------------
+----------------------------------------
+
+genErdosRenyi :: Int -> Double -> IO (Gr () ())
+genErdosRenyi n p = do
+  let possibleEdges = [(i, j) | i <- [1 .. n], j <- [1 .. n], i < j]
+  edges <- genEdges possibleEdges p
+  return $ mkUGraph [1 .. n] edges
+
+genEdges :: [(Int, Int)] -> Double -> IO [(Int, Int)]
+genEdges [] _ = return []
+genEdges (x : xs) p = do
+  r <- randomRIO (0.0, 1.0)
+  recursion <- genEdges xs p
+  return $ if r < p then x : recursion else recursion
