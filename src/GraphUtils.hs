@@ -15,6 +15,7 @@ module GraphUtils (
   avg,
   caroWei,
   greedyUnconnected,
+  randomGreedyUnconnected,
   genErdosRenyi,
 )
 where
@@ -205,26 +206,34 @@ diameter g
 caroWei :: Gr () () -> IO [Int]
 caroWei g = do
   labeledGraph <- addRandomLabels g
-  return $ caroWei' g $ noNodes g
+  return $ caroWei' labeledGraph $ sortBy (on compare snd) $ labNodes labeledGraph
 
-caroWei' :: Gr () () -> Int -> [Int]
-caroWei' g 0 = []
-caroWei' g n =
-  let l = map (\i -> lab g n < lab g i) $ neighbors g n
-   in if and l then n : caroWei' g (n - 1) else caroWei' g (n - 1)
+caroWei' :: Gr Int () -> [(Int, Int)] -> [Int]
+caroWei' _ [] = []
+caroWei' g ((node, _) : xs) =
+  let l = map (\i -> lab g node < lab g i) $ neighbors g node
+   in if and l then node : caroWei' g xs else caroWei' g xs
+
+greedyUnconnected :: Gr () () -> IO [Int]
+greedyUnconnected g = return $ greedyUnconnected' g (nodes g) []
+
+greedyUnconnected' :: Gr () () -> [Int] -> [Int] -> [Int]
+greedyUnconnected' _ [] set = set
+greedyUnconnected' g (node : xs) set =
+  if any (`elem` set) (neighbors g node) then greedyUnconnected' g xs set else greedyUnconnected' g xs (node : set)
 
 -- This uses the variant with random labels described in task 7
-greedyUnconnected :: Gr () () -> IO [Int]
-greedyUnconnected g = do
+randomGreedyUnconnected :: Gr () () -> IO [Int]
+randomGreedyUnconnected g = do
   labeledGraph <- addRandomLabels g
   let sortedNodes = sortBy (on compare snd) (labNodes labeledGraph)
-  return $ greedyUnconnected' labeledGraph sortedNodes []
+  return $ randomGreedyUnconnected' labeledGraph sortedNodes []
 
-greedyUnconnected' :: Gr Int () -> [(Int, Int)] -> [Int] -> [Int]
-greedyUnconnected' g [] set = set
-greedyUnconnected' g ((node, _) : xs) set =
+randomGreedyUnconnected' :: Gr Int () -> [(Int, Int)] -> [Int] -> [Int]
+randomGreedyUnconnected' g [] set = set
+randomGreedyUnconnected' g ((node, _) : xs) set =
   let l = map (`elem` set) $ neighbors g node
-   in if or l then greedyUnconnected' g xs set else greedyUnconnected' g xs (node : set)
+   in if or l then randomGreedyUnconnected' g xs set else randomGreedyUnconnected' g xs (node : set)
 
 addRandomLabels :: Gr () () -> IO (Gr Int ())
 addRandomLabels g = do
@@ -237,13 +246,14 @@ addRandomLabels g = do
 
 genErdosRenyi :: Int -> Double -> IO (Gr () ())
 genErdosRenyi n p = do
-  let possibleEdges = [(i, j) | i <- [1 .. n], j <- [1 .. n], i < j]
-  edges <- genEdges possibleEdges p
-  return $ mkUGraph [1 .. n] edges
+  let nodes = [1 .. n]
+      edges = [(i, j) | i <- nodes, j <- nodes, i < j]
 
-genEdges :: [(Int, Int)] -> Double -> IO [(Int, Int)]
-genEdges [] _ = return []
-genEdges (x : xs) p = do
-  r <- randomRIO (0.0, 1.0)
-  recursion <- genEdges xs p
-  return $ if r < p then x : recursion else recursion
+  selectedEdges <- foldEdges edges p
+  return $ mkUGraph nodes selectedEdges
+ where
+  foldEdges :: [(Int, Int)] -> Double -> IO [(Int, Int)]
+  foldEdges edges prob = do
+    let numEdges = length edges
+    randoms <- replicateM numEdges (randomRIO (0.0, 1.0) :: IO Double)
+    return $ map fst $ filter (\(_, r) -> r < prob) $ zip edges randoms

@@ -3,7 +3,7 @@ module Main where
 import GraphUtils
 import SampleGraphs (createSampleGraphL8F8)
 import System.Random (randomRIO)
-import Tasks (task6)
+import Tasks (task10, task6)
 import Visualization (makeHistogram, visualizeDirectedUnlabelledGraph, visualizeUnlabelledGraph)
 
 -- TODO: Rename this module
@@ -33,5 +33,7 @@ main = do
 
   erdosRenyi <- genErdosRenyi 10 0.5
   visualizeUnlabelledGraph erdosRenyi "out/ErdosRenyi.png"
+
+  task10 10
 
   putStrLn "Done"
