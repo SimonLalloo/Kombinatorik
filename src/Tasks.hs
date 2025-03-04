@@ -1,7 +1,21 @@
 module Tasks (task6, task10) where
 
 import Data.Graph.Inductive.Graph (noNodes)
-import GraphUtils (avg, avgDegree, caroWei, degrees, diameter, genErdosRenyi, genGaltonWatson, genRandomTree, greedyUnconnected, maxDegree, minDegree, poisson, randomGreedyUnconnected)
+import GraphUtils (
+    avg,
+    avgDegree,
+    caroWei,
+    degrees,
+    diameter,
+    genErdosRenyi,
+    genGaltonWatson,
+    genRandomTree,
+    greedyUnconnected,
+    maxDegree,
+    minDegree,
+    poisson,
+    randomGreedyUnconnected,
+ )
 import System.Random (randomRIO)
 import Visualization (makeHistogram, visualizeDirectedUnlabelledGraph)
 

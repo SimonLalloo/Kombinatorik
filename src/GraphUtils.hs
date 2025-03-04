@@ -31,7 +31,20 @@ import Data.Graph.Inductive (
   neighbors,
   nodes,
  )
-import Data.Graph.Inductive.Graph
+import Data.Graph.Inductive.Graph (
+  Graph (labNodes, mkGraph, noNodes),
+  LEdge,
+  LNode,
+  Node,
+  deg,
+  delNode,
+  gmap,
+  lab,
+  mkUGraph,
+  neighbors,
+  nodes,
+  outdeg,
+ )
 import Data.List (maximumBy, sort, sortBy, (\\))
 import Data.Ord (comparing)
 import System.Random (randomRIO)

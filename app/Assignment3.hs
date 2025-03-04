@@ -1,12 +1,17 @@
 module Main where
 
-import GraphUtils
+import GraphUtils (
+  genErdosRenyi,
+  genGaltonWatson,
+  genRandomTree,
+  makePruferCode,
+  makePruferGraph,
+  randomFromTree,
+ )
 import SampleGraphs (createSampleGraphL8F8)
 import System.Random (randomRIO)
 import Tasks (task10, task6)
 import Visualization (makeHistogram, visualizeDirectedUnlabelledGraph, visualizeUnlabelledGraph)
-
--- TODO: Rename this module
 
 -- This requires that you have a directory "out/" in the same path as the executable
 main :: IO ()
@@ -29,11 +34,15 @@ main = do
   galtonWatson <- genGaltonWatson $ randomFromTree randomTree
   visualizeDirectedUnlabelledGraph galtonWatson "out/GaltonWatson.png"
 
+  -- Run task 6
   task6 1000
 
+  -- Test Erdos-Renyi
   erdosRenyi <- genErdosRenyi 10 0.5
   visualizeUnlabelledGraph erdosRenyi "out/ErdosRenyi.png"
 
-  task10 10
+  -- Run task 10
+  -- Warning: performance issues: Use very low numbers unless necessary
+  task10 5
 
   putStrLn "Done"
