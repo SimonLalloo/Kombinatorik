@@ -59,12 +59,12 @@ convertToLabelledGraph g =
 makeHistogram :: (Show a, Real a) => [a] -> String -> IO ()
 makeHistogram values name = do
   let convertedData = map (\g -> (head g, length g)) $ group $ sort values
-  generateGraph convertedData "test" ("out/" ++ name ++ ".png")
+  generateGraph convertedData name ("out/" ++ name ++ ".png")
 
 generateGraph :: (Show a, BarsPlotValue y) => [(a, y)] -> String -> FilePath -> IO ()
 generateGraph values title path =
   toFile def path $ do
-    layout_title .= "Sample Bars"
+    layout_title .= title
     layout_title_style . font_size .= 10
     layout_x_axis . laxis_generate .= autoIndexAxis (map (show . fst) values)
     plot $ plotBars <$> bars [title] (addIndexes (map ((: []) . snd) values))
